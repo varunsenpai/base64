@@ -18,3 +18,15 @@ bool vial_set_token_count(vial_dets_t *vial, uint32_t token_count) {
 bool vial_set_original_token_count(vial_dets_t *vial, uint32_t original_token_count) {
     vial->original_token_count = original_token_count;
 }
+
+void set_table(token_table_t *table) {
+    table->table_version = 0x01;
+    table->padding_bytes = 0x00;
+    
+    for(int i = 0; i < SRV_TOKEN_TABLE_MAX_ENTRIES; i++) {
+        table->rows[i].serial_number = 0xABCDEF01;
+        table->rows[i].tokens_on_vial = 0xFF;
+        table->rows[i].tokens_remaining = 0xFF;
+        table->rows[i].original_tokens = 0xFF;
+    }
+}

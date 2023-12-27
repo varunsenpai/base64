@@ -7,4 +7,5 @@ project(
 )
 
 add_library(aes STATIC src/aes.c)
+target_compile_options(aes PUBLIC -g)
 target_include_directories(aes PUBLIC inc)

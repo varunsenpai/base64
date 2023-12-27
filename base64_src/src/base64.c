@@ -4,12 +4,9 @@
 
 const char base64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
-bool base64_encode(uint8_t *input, char *output, uint8_t input_size, uint8_t output_size);
-bool base64_decode(char *input, uint8_t *output, uint8_t input_size, uint8_t output_size);
+static bool base64_char_position(char input_char, uint16_t *position);
 
-static bool base64_char_position(char input_char, uint8_t *position);
-
-bool base64_encode(uint8_t *input, char *output, uint8_t input_size, uint8_t output_size) {
+bool base64_encode(uint8_t *input, char *output, uint16_t input_size, uint16_t output_size) {
 
     //check if output buff is enough for encoded base64 output
     int required_buff_size = 4 * ((int)(input_size/3) + (input_size % 3 != 0));
@@ -20,7 +17,7 @@ bool base64_encode(uint8_t *input, char *output, uint8_t input_size, uint8_t out
         return false;
     }
 
-    uint8_t count = 0;
+    uint16_t count = 0;
     uint8_t state = 0;
     uint32_t process_three_bytes = 0;
     uint16_t output_buf_iterator = 0;
@@ -28,7 +25,7 @@ bool base64_encode(uint8_t *input, char *output, uint8_t input_size, uint8_t out
     uint8_t second_6_bits = 0;
     uint8_t third_6_bits = 0;
     uint8_t fourth_6_bits = 0;
-    uint8_t i = 0;
+    uint16_t i = 0;
     
     bool stop_flow = false;
     while((i < input_size) && (!stop_flow))
@@ -100,7 +97,7 @@ bool base64_encode(uint8_t *input, char *output, uint8_t input_size, uint8_t out
     return true;
 }
 
-bool base64_decode(char *input, uint8_t *output, uint8_t input_size, uint8_t output_size) {
+bool base64_decode(char *input, uint8_t *output, uint16_t input_size, uint16_t output_size) {
 
     //check if the input is a multiple of 4
     if(input_size % 4) {
@@ -109,7 +106,7 @@ bool base64_decode(char *input, uint8_t *output, uint8_t input_size, uint8_t out
     }
 
     //count no of padding characters
-    uint8_t pad_chars = 0;
+    uint16_t pad_chars = 0;
 
     for(int i = 0; i < input_size; i++)
     {
@@ -118,7 +115,7 @@ bool base64_decode(char *input, uint8_t *output, uint8_t input_size, uint8_t out
     }
 
     //check required buf size for decoded output
-    uint8_t req_buf_size = 3 * (int)(input_size / 4) - pad_chars;
+    uint16_t req_buf_size = 3 * (uint16_t)(input_size / 4) - pad_chars;
 
     if(req_buf_size > output_size)
     {
@@ -126,15 +123,15 @@ bool base64_decode(char *input, uint8_t *output, uint8_t input_size, uint8_t out
         return false;
     }
 
-    uint8_t i = 0;
+    uint16_t i = 0;
     bool stop_flow = false;
     uint8_t state = 0;
     uint32_t process_4_chars = 0;
-    uint8_t val1 = 0;
-    uint8_t val2 = 0;
-    uint8_t val3 = 0;
-    uint8_t val4 = 0;
-    uint8_t output_buf_iterator = 0;
+    uint16_t val1 = 0;
+    uint16_t val2 = 0;
+    uint16_t val3 = 0;
+    uint16_t val4 = 0;
+    uint16_t output_buf_iterator = 0;
 
     //group 4 base64 characters and split them into 3 bytes separately
     while(i <(input_size) && !stop_flow)
@@ -213,7 +210,7 @@ bool base64_decode(char *input, uint8_t *output, uint8_t input_size, uint8_t out
     }
 }
 
-static bool base64_char_position(char input_char, uint8_t *position) {
+static bool base64_char_position(char input_char, uint16_t *position) {
     bool found = false;
 
     for(int i = 0; i < sizeof(base64); i++)
