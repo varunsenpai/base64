@@ -36,4 +36,6 @@ bool vial_set_serial_num(vial_dets_t *vial, uint32_t serial_number);
 bool vial_set_token_count(vial_dets_t *vial, uint32_t token_count);
 bool vial_set_original_token_count(vial_dets_t *vial, uint32_t original_token_count);
 
+void set_table(token_table_t *table);
+
 #endif /* __SRV_TOKEN_H__ */

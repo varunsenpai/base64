@@ -6,4 +6,5 @@ project(
 )
 
 add_library(base64 STATIC src/base64.c)
+target_compile_options(base64 PUBLIC -g)
 target_include_directories(base64 PUBLIC inc)

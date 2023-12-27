@@ -7,6 +7,7 @@ project(
 )
 
 add_executable(base64_app app.c)
+target_compile_options(base64_app PRIVATE -g)
 add_subdirectory(aes)
 add_subdirectory(base64_src)
 add_subdirectory(token_service)
