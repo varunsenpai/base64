@@ -45,6 +45,7 @@ int main() {
     set_table(&table);
 
     //need a buffer of 1088 bytes for an input of 816 bytes
+    //TODO: add table encryption logic
     char encoded_table[1088] = { 0 };
     encode_table(&table, encoded_table, sizeof(encoded_table));
     print_base64_chars(encoded_table, sizeof(encoded_table));
