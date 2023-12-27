@@ -7,7 +7,7 @@
     },
     "configurePresets": [
         {
-            "name": "Debug",
+            "name": "Debug Build",
             "generator": "Unix Makefiles",
             "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
