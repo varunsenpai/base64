@@ -11,8 +11,8 @@
           "isDefault": true
         },
         "presentation": {
-          "reveal": "always",
-          "panel": "new"
+          "reveal": "silent",
+          "panel": "shared"
         },
         "problemMatcher": "$gcc"
       }
