@@ -17,10 +17,12 @@ static void decrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
 static bool encode_vial(vial_dets_t *vial, char *encoded_output, uint8_t output_size);
 static bool encode_table(token_table_t *table, char *encoded_output, uint16_t output_size);
 static bool decode_table(char *encoded_table, token_table_t *table, uint16_t input_size, uint16_t output_size);
+static void encrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size);
+static void decrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size);
 
 int main() {
     vial_dets_t v1 = { 0 };
-    struct AES_ctx ctx;
+    struct AES_ctx ctx,ctx1;
 
     vial_init(&v1);
     vial_set_serial_num(&v1, 0xABCDEF02);
@@ -47,11 +49,18 @@ int main() {
     //need a buffer of 1088 bytes for an input of 816 bytes
     //TODO: add table encryption logic
     char encoded_table[1088] = { 0 };
+
+    //try to use the same context
+    encrypt_table(&ctx, &table, sizeof(table));
     encode_table(&table, encoded_table, sizeof(encoded_table));
+
     print_base64_chars(encoded_table, sizeof(encoded_table));
+
     decode_table(encoded_table, &table_1, sizeof(encoded_table), sizeof(table_1));
+    decrypt_table(&ctx, &table_1, sizeof(table_1));
 
     printf("%X\n", table_1.rows[49].original_tokens);
+    printf("%lX\n", table_1.table_version);
 }
 
 static void print_array(uint8_t *array, uint8_t size){
@@ -102,4 +111,15 @@ static bool decode_table(char *encoded_table, token_table_t *table, uint16_t inp
     bool status = base64_decode(encoded_table, (uint8_t *)table, input_size, output_size);
 
     return status;
+}
+
+static void encrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size) {
+    AES_ctx_set_iv(ctx,iv);
+    AES_init_ctx_iv(ctx, key, iv);
+    AES_CBC_encrypt_buffer(ctx, (uint8_t *)table, size);
+}
+
+static void decrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size) {
+    AES_ctx_set_iv(ctx,iv);
+    AES_CBC_decrypt_buffer(ctx, (uint8_t *)table, size);
 }
