@@ -20,10 +20,11 @@ static bool encode_table(token_table_t *table, char *encoded_output, uint16_t ou
 static bool decode_table(char *encoded_table, token_table_t *table, uint16_t input_size, uint16_t output_size);
 static void encrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size);
 static void decrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size);
+static void print_string_array(char *array, uint8_t size);
 
 int main() {
     vial_dets_t v1 = { 0 };
-    struct AES_ctx ctx,ctx1,ctx2,ctx3;
+    struct AES_ctx ctx,ctx1,ctx2,ctx3,ctx4;
 
     vial_init(&v1);
     vial_set_serial_num(&v1, 0xABCDEF02);
@@ -66,7 +67,7 @@ int main() {
     //try the output of the machine
     char *input_machine_answer = "YlsEUJQ+gLVCHEwQkVuZtQ==";
 
-    char *input_table = "2MVZPBDO7FzpmD6wnXjcH4MUAhO4FE/LBq52WM6EVOm4sotrqUsu6MOhClXJxpA/pcBl8CZwnArnB8IjCrmFF9jak6GARMjwipe70PY7TpVpbUTnKaXXT/QNwm9RrErFdReW8ySUj0St3uZTfw3lJd183ybKfx0qrLe7B7lJ6Uw1jX3AjL4NkN/HoJ2ry/IMT/DWiJfRH/ooYp+7NM9lNwn8k42FjMBJYrRjygGG0Z9rAV9PeBsbGCuUQQBpC42fVrTMrX+/xRGq8+5kQNPl374GY0+ddw1YFC56nNsn0+R/U4F9sFXcACob1jUM9kQNZCbK1vfP0a+9lEYI5L0D3BpHKK+2MsPtkqGYRu6/2gkour/YolAdfe1sHhdaMCpbzL0pCxutSjqquW9pi6YEzl0cT3Y4OtybxjoIWlhMd4DIjQP+xajP/9EqqwPssuDO3ZEiNTB/RgqoTkPVSqBYKB8IYYzv9r1gmjn/ME3mI7pv+omYBH0ep/xO2PuT68NpfHyQKcfcbg4R2o5TBw20d25WgV8LTO+hkjdykQ45ya7kQOyzomkkIhA/2Q3xVeYxLTlLJpPrhcsunmNv58CxRlAAvJ77/qwqFkGZDgjefkYmyPRWbUsiQNGoRWWUnN/4xd1LCqrqwB6ds4F/qg6cJn4LcPvdD0bI7GXTzLD/O1rUolKz6R2lT78dZn7MMMusY7qDWSygeDB/gtQ1WUc1KtyAnqqq3R+A4cZq6tsIRwJ/yNY9f8AoXKxd368FTTCB9XzmyGvvCm9cAEo+LFRjASOH2KT1z3qjoKYu5rfRVgDzrj81ERd4RAkz7F0blwEtUlwCPe5DxeqO1nNVkMTBGV9V7clCQpOA4DNZYO39v1Vcj6f+sTfZeyFjQAutRKAQTfZUXbgob7CXg/OEqqnwUhmhZGquuqCFeXy6TNzE1bXmTv/YsDucI57x5ZeeQj8wOpHLkxLjHz1uRxoknpS5RW3HT/iBT9VOdiG9b9M7BrEdaxkQ7FnlyTra0l5D/WDeBOVWkUvuziNUAd9N9Q0+2GazEcoSOUdMmK8BfNZuRQGAJnrrKU9GB9F+EZxZU6N8";
+    char *input_table = "a4440r2NEtxqyUv/Kb1B+rwTvVE1MM6/aVQz3aIBmN6CyL8iQi1L7u/z88Ycg3MjvQMBcAnBSEgtaXq6nd7+MNGyYUGbbos7ryxxc6Jtmyj60MlCgqNaBf9NmeBN+FdpQ4A98LI9hkRuMHEw/lXpKbSfG2qrLtzCl73kjAXeJKIUjQRsDwrrPlYbFBs7K+tfrVU5rdvMgZprVlqR/fzgQccouwsk2IFyCBFTUy6UH02PuJuLnCs2FJ+RQ9ijUCk7jGADd5+cn5jLJ3lEoXrPDXaEPcNZgrbt7Sle8jy5u7ubg8jvNX+lwAa6p+OWdfDepvUvWxNZtdKIyjKL6b89tIxcVRgKe0+gQ4iVkWerxHQ8DZ6DtzZ8pbEwWzSx9CNMMwcl2nXwIC6ErpoCjiqvL7RY/bKOnWvpo8cIALNSMENYmrFpzgcIslenoXu48g9vTDJqTS7jjSaJ+NMCGj8Z/Uv6svHV3DGD7rEOJ/l2YmiBk1DEMuMlPJ2E4N76mlsr4ieP8XcG2idkesg3zA9kZL46u/lEXNpKNnXQGNMGQN5Qi5dHfyA98ZmqpSidMyjNhByJM5oVZdm1dx9OHI6zTTuh7SqS9W29vT8HKYW2PlnIwXcCniOb1fMHMR1kCw8xKIDPqSB5+D+WrcHPudVp7osEAqncNTTHpUrpL9969zJvvx2Ui2Ra0orFuD8v5mzaqnHbUs77/1H8JoGPC8TFytx8ZOYVNdrOVZBM4Hd3CE5imA27x0xlva9fVG6t4qfrWixHf3+WQa3YyOOtLH6o/TBEnTDjHFDzP0TL38m5ANVPFXrf2muGY7rJT+hx1cEPbgosw6bdDTcH1S8Ob9efExN+MJFivKia+BBecYGkmedTjQbkdUDw1zEYLyT+HGCm/9FSsDT/tU/nsv7NJG6tYYEXLu1hQhZv0B3z1VepC2mP8+DEwfax3+78grjs0SCmf4y+mb213oS+8/KIyHEVDe1d9ByNW+Gm4mBst0kuzjcYLuE8ToKsXelkuPGxQ07qEtC1pHAx95q4cN/g1fdnSs7P3+MufGG9hcC1CRlb6FwMvOmjTYyBN/oOUll22ScO";
 
     //base64 decode the vial first
     vial_dets_t new_vial = { 0 };
@@ -83,6 +84,29 @@ int main() {
     //decrypt table
     decrypt_table(&ctx3, &new_table, sizeof(new_table));
 
+    //to test the set table logic now
+    // iterate every 24 base64 characters, which is 16 bytes
+    uint8_t table_to_split[816] = { 0 };
+    memcpy(table_to_split, &new_table, sizeof(table_to_split));
+
+    char temp[24] = { 0 };
+    for(uint8_t i = 0; i < 51; ++i) {
+        AES_ctx_set_iv(&ctx4,iv);
+        AES_init_ctx_iv(&ctx4, key, iv);
+        AES_CBC_encrypt_buffer(&ctx4, &(table_to_split[16 * i]), 16);
+        base64_encode(&(table_to_split[16 * i]), temp, 16, 24);
+        print_string_array(temp, 24);
+        memset(temp, 0, sizeof(temp));    
+    }
+
+
+}
+
+static void print_string_array(char *array, uint8_t size) {
+    for(int i = 0; i < size; i++) {
+        printf("%c", array[i]);
+    }
+    printf("\n");
 }
 
 static void print_array(uint8_t *array, uint8_t size){
