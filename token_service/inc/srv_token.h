@@ -41,5 +41,9 @@ void encrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
 void decrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
 
 void set_table(token_table_t *table);
+bool encode_table(token_table_t *table, char *encoded_output, uint16_t output_size);
+bool decode_table(char *encoded_table, token_table_t *table, uint16_t input_size, uint16_t output_size);
+void encrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size);
+void decrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size);
 
 #endif /* __SRV_TOKEN_H__ */

@@ -43,3 +43,27 @@ void set_table(token_table_t *table) {
         table->rows[i].original_tokens = 0xFF;
     }
 }
+
+bool encode_table(token_table_t *table, char *encoded_output, uint16_t output_size) {
+    bool status = base64_encode((uint8_t *)table, encoded_output, sizeof(*table), output_size);
+
+    return status;
+}
+
+bool decode_table(char *encoded_table, token_table_t *table, uint16_t input_size, uint16_t output_size) {
+    bool status = base64_decode(encoded_table, (uint8_t *)table, input_size, output_size);
+
+    return status;
+}
+
+void encrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size) {
+    AES_ctx_set_iv(ctx,iv);
+    AES_init_ctx_iv(ctx, key, iv);
+    AES_CBC_encrypt_buffer(ctx, (uint8_t *)table, size);
+}
+
+void decrypt_table(struct AES_ctx *ctx, token_table_t *table, uint16_t size) {
+    AES_init_ctx_iv(ctx, (uint8_t *)key, iv);
+    AES_ctx_set_iv(ctx,iv);
+    AES_CBC_decrypt_buffer(ctx, (uint8_t *)table, size);
+}

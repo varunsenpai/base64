@@ -18,12 +18,38 @@ class VialDets(ctypes.Structure):
         ("original_token_count", ctypes.c_uint32)
     ]
 
+# Define the maximum number of entries
+SRV_TOKEN_TABLE_MAX_ENTRIES = 50
+
+# Define the rows_t structure
+class Rows(ctypes.Structure):
+    _fields_ = [
+        ('serial_number', ctypes.c_uint32),             # Serial number of the card
+        ('tokens_remaining', ctypes.c_uint32),          # Tokens left
+        ('tokens_on_vial', ctypes.c_uint32),            # Tokens on the vial
+        ('original_tokens', ctypes.c_uint32),           # Maximum capacity of tokens
+    ]
+
+# Define the token_table_t structure
+class TokenTable(ctypes.Structure):
+    _pack_ = 1
+    _fields_ = [
+        ('table_version', ctypes.c_uint64),              # Version to track changes
+        ('padding_bytes', ctypes.c_uint64),              # Pad the table to make it a multiple of 16 for AES encryption
+        ('rows', Rows * SRV_TOKEN_TABLE_MAX_ENTRIES),    # Card details, MAX of 50 for now
+    ]
+
 so_file = "build/libbase64_app_lib.so"
 my_functions = ctypes.CDLL(so_file)
 my_functions.base64_encode.restype = ctypes.c_bool
 my_functions.base64_encode.argtypes = [ctypes.POINTER(ctypes.c_uint8), ctypes.POINTER(ctypes.c_char), ctypes.c_uint16, ctypes.c_uint16]
 my_functions.encrypt_vial.argtypes = [ctypes.POINTER(AES_ctx), ctypes.POINTER(VialDets)]
 my_functions.decrypt_vial.argtypes = [ctypes.POINTER(AES_ctx), ctypes.POINTER(VialDets)]
+my_functions.encrypt_table.argtypes = [ctypes.POINTER(AES_ctx), ctypes.POINTER(TokenTable), ctypes.c_uint16]
+my_functions.decrypt_table.argtypes = [ctypes.POINTER(AES_ctx), ctypes.POINTER(TokenTable), ctypes.c_uint16]
+my_functions.encode_table.argtypes = [ctypes.POINTER(TokenTable), ctypes.c_char_p, ctypes.c_uint16]
+my_functions.encode_table.restype = ctypes.c_bool
+
 
 def populate_vial(vial_details: VialDets, version_number = 0, serial_number = 0, token_count = 0, original_token_count = 0):
     vial_details.magic_number = (ctypes.c_uint8 * 3)(0x18, 0x56, 0xEB)
@@ -70,6 +96,29 @@ def decrypt_vial(vial: VialDets):
     aes_ctx = AES_ctx()
     my_functions.decrypt_vial(ctypes.byref(aes_ctx), ctypes.byref(vial))
 
+def encrypt_table(table: TokenTable):
+    aes_ctx = AES_ctx()
+    my_functions.encrypt_table(ctypes.byref(aes_ctx), ctypes.byref(table), ctypes.sizeof(table))
+
+def decrypt_table(table: TokenTable):
+    aes_ctx = AES_ctx()
+    my_functions.decrypt_table(ctypes.byref(aes_ctx), ctypes.byref(table), ctypes.sizeof(table))
+
+def encode_table(table: TokenTable):
+    encoded_output = ctypes.create_string_buffer(1088)
+    result = my_functions.encode_table(ctypes.byref(table), encoded_output, 1088)
+
+    if result:
+        return encoded_output
+    else:
+        print('table encode failed')
+
+def decode_table(table:TokenTable, input_encoded_table):
+    result = my_functions.decode_table(input_encoded_table, ctypes.byref(table), ctypes.sizeof(table), 1088)
+
+    if not result:
+        print('table encode failed')
+
 def print_vial(vial: VialDets):
     print("Magic Number:", ''.join(f"{x:02x}" for x in vial.magic_number))
     print("Version Number:", f"{vial.version_number:02x}")
@@ -89,6 +138,26 @@ def main():
     decode_vial_details(output_string, decoded_vial)
     decrypt_vial(decoded_vial)
     print_vial(decoded_vial)
+
+    input_table = TokenTable()
+    input_table.version = 1
+    input_table.rows[0].serial_number = 0xABCDEF02
+    input_table.rows[0].tokens_remaining = 100
+    input_table.rows[0].tokens_on_vial = 50
+    input_table.rows[0].original_tokens = 150
+
+    encrypt_table(input_table)
+    encoded_table = encode_table(input_table)
+    print(encode_table)
+
+    decoded_table = TokenTable()
+    decode_table(decoded_table, encoded_table)
+    decrypt_table(decoded_table)
+
+    print(f'{decoded_table.rows[0].serial_number:08x}')
+    print(f'{decoded_table.rows[0].tokens_remaining:08x}')
+    print(f'{decoded_table.rows[0].tokens_on_vial:08x}')
+    print(f'{decoded_table.rows[0].original_tokens:08x}')
 
 if __name__ == "__main__":
     main()
