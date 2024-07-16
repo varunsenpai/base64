@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "aes.h"
 #define SRV_TOKEN_TABLE_MAX_ENTRIES     50
 
 /* Exported types */
@@ -35,6 +36,9 @@ bool vial_init(vial_dets_t *vial);
 bool vial_set_serial_num(vial_dets_t *vial, uint32_t serial_number);
 bool vial_set_token_count(vial_dets_t *vial, uint32_t token_count);
 bool vial_set_original_token_count(vial_dets_t *vial, uint32_t original_token_count);
+
+void encrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
+void decrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
 
 void set_table(token_table_t *table);
 

@@ -12,8 +12,7 @@ char *key = "Thisisthekey16BtThisisthekey16Bt";
 static void print_array(uint8_t *array, uint8_t size);
 static void print_vial(vial_dets_t *vial);
 static void print_base64_chars(char *encoded_array, uint16_t size);
-static void encrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
-static void decrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial);
+
 static bool encode_vial(vial_dets_t *vial, char *encoded_output, uint8_t output_size);
 static bool decode_vial(char *encoded_input, vial_dets_t *vial, uint8_t input_size);
 static bool encode_table(token_table_t *table, char *encoded_output, uint16_t output_size);
@@ -41,7 +40,7 @@ int main() {
     //decrypt
     base64_decode(encoded_array, (uint8_t *)&v1, sizeof(encoded_array), sizeof(v1));
     decrypt_vial(&ctx1, &v1);
-    //print_vial(&v1);
+    print_vial(&v1);
 
     // //table stuff
     // token_table_t table = { 0 };
@@ -137,17 +136,6 @@ static void print_base64_chars(char *encoded_array, uint16_t size) {
         printf("%c", encoded_array[i]);
     }
     printf("\n");
-}
-
-static void encrypt_vial(struct AES_ctx *ctx, vial_dets_t *v1) {
-    AES_init_ctx_iv(ctx, key, iv);
-    AES_CBC_encrypt_buffer(ctx, (uint8_t *)v1, sizeof(*v1));
-}
-
-static void decrypt_vial(struct AES_ctx *ctx, vial_dets_t *vial) {
-    AES_init_ctx_iv(ctx, (uint8_t *)key, iv);
-    AES_ctx_set_iv(ctx, iv);
-    AES_CBC_decrypt_buffer(ctx, (uint8_t *)vial, sizeof(*vial));
 }
 
 static bool encode_vial(vial_dets_t *vial, char *encoded_output, uint8_t output_size) {
